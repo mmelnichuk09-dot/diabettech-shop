@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+     <html lang="en">
+     <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Order Confirmed</title>
+       <style>
+         body {
+           font-family: 'Roboto', sans-serif;
+           margin: 0;
+           padding: 0;
+           background-color: #f9f9f9;
+           color: #333;
+           text-align: center;
+         }
+         .container {
+           max-width: 400px;
+           margin: 20px auto;
+           padding: 20px;
+           background: #fff;
+           border-radius: 10px;
+           box-shadow: 0 0 10px rgba(0,0,0,0.1);
+         }
+         h1 {
+           font-size: 1.5em;
+           color: #2c5282;
+         }
+         p {
+           font-size: 1em;
+           color: green;
+         }
+         a {
+           display: inline-block;
+           padding: 10px;
+           background-color: #2c5282;
+           color: white;
+           text-decoration: none;
+           border-radius: 5px;
+         }
+         a:hover {
+           background-color: #2b6cb0;
+         }
+       </style>
+     </head>
+     <body>
+       <div class="header">
+         <h1>DiabetTech</h1>
+       </div>
+       <div class="container">
+         <h1>Order Confirmed!</h1>
+         <p>Thank you for your purchase. Your order details have been sent to your email.</p>
+         <p>Delivery: Free (4-7 days)</p>
+         <p>Once order is shipped, we’ll send you a tracking number</p>
+         <a href="{% url 'create_order' %}">Back to Shop</a>
+       </div>
+     </body>
+     </html>
