@@ -1,0 +1,1 @@
+web: gunicorn freestyle_shop_test.wsgi --log-file -
