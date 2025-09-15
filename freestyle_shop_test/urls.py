@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import render
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop_orders.urls')),  # подключаем routes приложения
+    path('test-static/', lambda request: render(request, 'test_static.html')),
 ]
