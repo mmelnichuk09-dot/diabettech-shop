@@ -60,7 +60,10 @@ WSGI_APPLICATION = 'freestyle_shop_test.wsgi.application'
 # Database
 # Для начала SQLite (локально и на Render для теста)
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': dj_database_url.config(
+        default='postgres://diabettech_db_user:m7QGNwSJdYl8pSOCxzIdpRhXzz4qNti2@dpg-d33udummcj7s73an3amg-a:5432/diabettech_db',
+        conn_max_age=600
+    )
 }
 
 # Если захочешь PostgreSQL (Render предоставляет), можно включить psycopg2:
