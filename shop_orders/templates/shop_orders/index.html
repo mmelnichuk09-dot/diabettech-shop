@@ -97,7 +97,7 @@
   <div class="container">
     <img src="{% static 'img/freestyle-libre-2.jpg' %}" alt="Freestyle Libre 2">
     <h1>Freestyle Libre 2</h1>
-    <p>Price: €1 | Free Delivery (4-7 days)</p>
+    <p>Price: €69 | Free Delivery (4-7 days)</p>
     <form id="payment-form" method="post" action="{% url 'create_payment_intent' %}">
       {% csrf_token %}
       <label for="quantity">Quantity:</label>
@@ -122,7 +122,7 @@
       <div id="card-errors" class="error" role="alert"></div>
 
       <button type="submit" id="buy-button">
-        <span class="btn-text">Buy Now (€1)</span>
+        <span class="btn-text">Buy Now (€69)</span>
         <span class="spinner">⏳</span>
       </button>
     </form>
@@ -160,7 +160,7 @@
             document.getElementById('card-errors').textContent = result.error.message;
             isProcessing = false;
             buyButton.disabled = false;
-            btnText.textContent = 'Buy Now (€1)';
+            btnText.textContent = 'Buy Now (€69)';
             spinner.style.display = 'none';
           } else {
             fetch("{% url 'create_payment_intent' %}", {
@@ -186,14 +186,14 @@
                   document.getElementById('card-errors').textContent = data.error;
                   isProcessing = false;
                   buyButton.disabled = false;
-                  btnText.textContent = 'Buy Now (€1)';
+                  btnText.textContent = 'Buy Now (€69)';
                   spinner.style.display = 'none';
                 }
               }).catch(error => {
                 document.getElementById('card-errors').textContent = 'Payment error: ' + error.message;
                 isProcessing = false;
                 buyButton.disabled = false;
-                btnText.textContent = 'Buy Now (€1)';
+                btnText.textContent = 'Buy Now (€69)';
                 spinner.style.display = 'none';
               });
           }
@@ -201,7 +201,7 @@
       });
 
       // Обновление текста кнопки при изменении количества
-      const pricePerItem = 1;
+      const pricePerItem = 69;
       const quantityInput = document.getElementById('quantity');
       function updateButtonText() {
         const qty = parseInt(quantityInput.value) || 1;
