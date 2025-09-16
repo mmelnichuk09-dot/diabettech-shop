@@ -95,7 +95,9 @@
   <div class="container">
     <img src="{% static 'img/freestyle-libre-2.jpg' %}" alt="Freestyle Libre 2">
     <h1>Freestyle Libre 2</h1>
-    <p>Price: €69 | Free Delivery (4-7 days)</p>
+    <p class="product-description">
+    Continuous glucose monitoring sensor — easy to use and accurate.</p>
+    <p>Price: €1 | Free Delivery (4-7 days)</p>
     <form id="payment-form" method="post" action="{% url 'create_payment_intent' %}">
       {% csrf_token %}
       <label for="quantity">Quantity:</label>
@@ -172,7 +174,7 @@
         });
       });
     });
-    const pricePerItem = 69;
+    const pricePerItem = 1;
     const quantityInput = document.getElementById('quantity');
     const buyButton = document.getElementById('buy-button');
 
