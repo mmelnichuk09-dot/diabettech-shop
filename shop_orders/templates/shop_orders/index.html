@@ -55,38 +55,20 @@
       border-radius: 5px;
     }
     button {
+      position: relative;
       padding: 10px;
       background-color: #2c5282;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      position: relative;
       display: flex;
-      justify-content: center;
       align-items: center;
-    }
-    button:hover {
-      background-color: #2b6cb0;
+      justify-content: center;
     }
     button:disabled {
-      background-color: #888;
+      opacity: 0.7;
       cursor: not-allowed;
-    }
-    /* Spinner */
-    .spinner {
-      display: none;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #fff;
-      border-top: 2px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 8px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
     #card-element {
       padding: 10px;
@@ -95,6 +77,10 @@
       margin-bottom: 10px;
       width: 100%;
       min-height: 40px;
+    }
+    .spinner {
+      display: none;
+      margin-left: 10px;
     }
     .success {
       color: green;
@@ -136,8 +122,8 @@
       <div id="card-errors" class="error" role="alert"></div>
 
       <button type="submit" id="buy-button">
-        <span>Buy Now (€1)</span>
-        <div class="spinner"></div>
+        <span class="btn-text">Buy Now (€1)</span>
+        <span class="spinner">⏳</span>
       </button>
     </form>
     <p>Contact: +353899810935 (WhatsApp)</p>
@@ -148,42 +134,34 @@
     document.addEventListener('DOMContentLoaded', function() {
       var stripe = Stripe('{{ stripe_public_key }}');
       var elements = stripe.elements();
-
       var card = elements.create('card', {
         style: { base: { fontSize: '16px', color: '#333' } },
         hidePostalCode: true
       });
       card.mount('#card-element');
 
-      const pricePerItem = 1;
-      const quantityInput = document.getElementById('quantity');
+      const form = document.getElementById('payment-form');
       const buyButton = document.getElementById('buy-button');
-      const buyText = buyButton.querySelector('span');
+      const btnText = buyButton.querySelector('.btn-text');
       const spinner = buyButton.querySelector('.spinner');
+      let isProcessing = false;
 
-      function updateButtonText() {
-        const qty = parseInt(quantityInput.value) || 1;
-        buyText.textContent = `Buy Now (€${qty * pricePerItem})`;
-      }
-
-      updateButtonText();
-      quantityInput.addEventListener('input', updateButtonText);
-
-      var form = document.getElementById('payment-form');
       form.addEventListener('submit', function(event) {
         event.preventDefault();
+        if (isProcessing) return;
+        isProcessing = true;
 
-        // Блокируем кнопку и включаем спиннер
         buyButton.disabled = true;
+        btnText.textContent = 'Processing...';
         spinner.style.display = 'inline-block';
-        buyText.textContent = 'Processing...';
 
         stripe.createToken(card).then(function(result) {
           if (result.error) {
             document.getElementById('card-errors').textContent = result.error.message;
+            isProcessing = false;
             buyButton.disabled = false;
+            btnText.textContent = 'Buy Now (€1)';
             spinner.style.display = 'none';
-            updateButtonText();
           } else {
             fetch("{% url 'create_payment_intent' %}", {
               method: 'POST',
@@ -206,21 +184,34 @@
                   window.location.href = "{% url 'order_success' %}";
                 } else {
                   document.getElementById('card-errors').textContent = data.error;
+                  isProcessing = false;
                   buyButton.disabled = false;
+                  btnText.textContent = 'Buy Now (€1)';
                   spinner.style.display = 'none';
-                  updateButtonText();
                 }
               }).catch(error => {
                 document.getElementById('card-errors').textContent = 'Payment error: ' + error.message;
+                isProcessing = false;
                 buyButton.disabled = false;
+                btnText.textContent = 'Buy Now (€1)';
                 spinner.style.display = 'none';
-                updateButtonText();
               });
           }
         });
       });
+
+      // Обновление текста кнопки при изменении количества
+      const pricePerItem = 1;
+      const quantityInput = document.getElementById('quantity');
+      function updateButtonText() {
+        const qty = parseInt(quantityInput.value) || 1;
+        btnText.textContent = `Buy Now (€${qty * pricePerItem})`;
+      }
+      quantityInput.addEventListener('input', updateButtonText);
+      updateButtonText();
     });
   </script>
 </body>
 </html>
+
 
