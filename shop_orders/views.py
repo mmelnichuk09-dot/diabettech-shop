@@ -30,7 +30,7 @@ def create_payment_intent(request):
             quantity = int(data.get('quantity', 1))
 
             # Считаем сумму на сервере
-            amount = 1 * quantity * 100  # в центах
+            amount = 69 * quantity * 100  # в центах
 
             # Создаем PaymentIntent напрямую без модели
             token = data.get('token')
