@@ -62,6 +62,9 @@
       border-radius: 5px;
       cursor: pointer;
       position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     button:hover {
       background-color: #2b6cb0;
@@ -79,17 +82,11 @@
       border-top: 2px solid transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    button.processing .spinner {
-      display: inline-block;
+      margin-left: 8px;
     }
     @keyframes spin {
-      0% { transform: translateY(-50%) rotate(0deg); }
-      100% { transform: translateY(-50%) rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     #card-element {
       padding: 10px;
@@ -139,7 +136,7 @@
       <div id="card-errors" class="error" role="alert"></div>
 
       <button type="submit" id="buy-button">
-        Buy Now (€1)
+        <span>Buy Now (€1)</span>
         <div class="spinner"></div>
       </button>
     </form>
@@ -158,14 +155,15 @@
       });
       card.mount('#card-element');
 
-      const pricePerItem = 1; // тестовая цена
+      const pricePerItem = 1;
       const quantityInput = document.getElementById('quantity');
       const buyButton = document.getElementById('buy-button');
+      const buyText = buyButton.querySelector('span');
+      const spinner = buyButton.querySelector('.spinner');
 
       function updateButtonText() {
         const qty = parseInt(quantityInput.value) || 1;
-        const total = qty * pricePerItem;
-        buyButton.childNodes[0].nodeValue = `Buy Now (€${total})`;
+        buyText.textContent = `Buy Now (€${qty * pricePerItem})`;
       }
 
       updateButtonText();
@@ -174,15 +172,17 @@
       var form = document.getElementById('payment-form');
       form.addEventListener('submit', function(event) {
         event.preventDefault();
+
+        // Блокируем кнопку и включаем спиннер
         buyButton.disabled = true;
-        buyButton.classList.add("processing");
-        buyButton.childNodes[0].nodeValue = "Processing... ";
+        spinner.style.display = 'inline-block';
+        buyText.textContent = 'Processing...';
 
         stripe.createToken(card).then(function(result) {
           if (result.error) {
             document.getElementById('card-errors').textContent = result.error.message;
             buyButton.disabled = false;
-            buyButton.classList.remove("processing");
+            spinner.style.display = 'none';
             updateButtonText();
           } else {
             fetch("{% url 'create_payment_intent' %}", {
@@ -207,13 +207,13 @@
                 } else {
                   document.getElementById('card-errors').textContent = data.error;
                   buyButton.disabled = false;
-                  buyButton.classList.remove("processing");
+                  spinner.style.display = 'none';
                   updateButtonText();
                 }
               }).catch(error => {
                 document.getElementById('card-errors').textContent = 'Payment error: ' + error.message;
                 buyButton.disabled = false;
-                buyButton.classList.remove("processing");
+                spinner.style.display = 'none';
                 updateButtonText();
               });
           }
