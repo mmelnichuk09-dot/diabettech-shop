@@ -21,5 +21,4 @@ from django.shortcuts import render
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop_orders.urls')),  # подключаем routes приложения
-    path('test-static/', lambda request: render(request, 'test_static.html')),
 ]
