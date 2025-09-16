@@ -61,10 +61,35 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      position: relative;
+    }
+    button:hover {
+      background-color: #2b6cb0;
     }
     button:disabled {
-      background-color: #aaa;
+      background-color: #888;
       cursor: not-allowed;
+    }
+    /* Spinner */
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    button.processing .spinner {
+      display: inline-block;
+    }
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
     }
     #card-element {
       padding: 10px;
@@ -113,7 +138,10 @@
       <div id="card-element"></div>
       <div id="card-errors" class="error" role="alert"></div>
 
-      <button type="submit" id="buy-button">Buy Now (€1)</button>
+      <button type="submit" id="buy-button">
+        Buy Now (€1)
+        <div class="spinner"></div>
+      </button>
     </form>
     <p>Contact: +353899810935 (WhatsApp)</p>
   </div>
@@ -130,16 +158,32 @@
       });
       card.mount('#card-element');
 
-      var form = document.getElementById('payment-form');
-      var buyButton = document.getElementById('buy-button');
+      const pricePerItem = 1; // тестовая цена
+      const quantityInput = document.getElementById('quantity');
+      const buyButton = document.getElementById('buy-button');
 
+      function updateButtonText() {
+        const qty = parseInt(quantityInput.value) || 1;
+        const total = qty * pricePerItem;
+        buyButton.childNodes[0].nodeValue = `Buy Now (€${total})`;
+      }
+
+      updateButtonText();
+      quantityInput.addEventListener('input', updateButtonText);
+
+      var form = document.getElementById('payment-form');
       form.addEventListener('submit', function(event) {
         event.preventDefault();
-        buyButton.disabled = true; // блокируем кнопку после клика
+        buyButton.disabled = true;
+        buyButton.classList.add("processing");
+        buyButton.childNodes[0].nodeValue = "Processing... ";
+
         stripe.createToken(card).then(function(result) {
           if (result.error) {
             document.getElementById('card-errors').textContent = result.error.message;
-            buyButton.disabled = false; // если ошибка — разблокируем
+            buyButton.disabled = false;
+            buyButton.classList.remove("processing");
+            updateButtonText();
           } else {
             fetch("{% url 'create_payment_intent' %}", {
               method: 'POST',
@@ -162,29 +206,21 @@
                   window.location.href = "{% url 'order_success' %}";
                 } else {
                   document.getElementById('card-errors').textContent = data.error;
-                  buyButton.disabled = false; // если ошибка — разблокируем
+                  buyButton.disabled = false;
+                  buyButton.classList.remove("processing");
+                  updateButtonText();
                 }
               }).catch(error => {
                 document.getElementById('card-errors').textContent = 'Payment error: ' + error.message;
-                buyButton.disabled = false; // если ошибка — разблокируем
+                buyButton.disabled = false;
+                buyButton.classList.remove("processing");
+                updateButtonText();
               });
           }
         });
       });
-
-      // пересчёт цены на кнопке
-      const pricePerItem = 1; // ТУТ меняешь цену
-      const quantityInput = document.getElementById('quantity');
-
-      function updateButtonText() {
-        const qty = parseInt(quantityInput.value) || 1;
-        const total = qty * pricePerItem;
-        buyButton.textContent = `Buy Now (€${total})`;
-      }
-
-      quantityInput.addEventListener('input', updateButtonText);
-      updateButtonText();
     });
   </script>
 </body>
 </html>
+
